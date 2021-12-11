@@ -33,7 +33,7 @@
 
 # Web related
 lib/generated_plugin_registrant.dart
-
+lib/models/api/youtube_api.dart
 # Symbolication related
 app.*.symbols
 

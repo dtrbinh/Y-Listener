@@ -4,8 +4,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="y_listener"
-        android:icon="@mipmap/ic_launcher">
+        android:label="Y Listener"
+        android:icon="@mipmap/launcher_icon">
 
         <activity
             android:name="com.ryanheise.audioservice.AudioServiceActivity"

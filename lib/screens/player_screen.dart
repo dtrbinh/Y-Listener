@@ -1,5 +1,4 @@
 // ignore_for_file: no_logic_in_create_state, unnecessary_const
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:y_listener/models/api/channelIcon.dart';
 import 'package:y_listener/models/api/youtube_api.dart';
