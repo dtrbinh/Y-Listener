@@ -5,10 +5,43 @@ import 'package:y_listener/screens/history_video_screen.dart';
 import 'package:youtube_api/youtube_api.dart';
 
 import 'package:y_listener/screens/player_screen.dart';
-import 'package:y_listener/models/youtube_api.dart';
-import 'package:y_listener/models/channelIcon.dart';
+import 'package:y_listener/models/api/youtube_api.dart';
+import 'package:y_listener/models/api/channelIcon.dart';
 
 List<YouTubeVideo> videoResult = [];
+
+void changeAPI() {
+  if (apiState >= 1 && apiState <= 5) {
+    apiState++;
+  } else {
+    apiState = 1;
+  }
+  checkAPIState();
+}
+
+void checkAPIState() {
+  switch (apiState) {
+    case 1:
+      apiKey = key1;
+      break;
+    case 2:
+      apiKey = key2;
+      break;
+    case 3:
+      apiKey = key3;
+      break;
+    case 4:
+      apiKey = key4;
+      break;
+    case 5:
+      apiKey = key5;
+      break;
+
+    default:
+      apiKey = "AIzaSyCMReGgd5e9a7sC_PSJP0QfCYcKlT2IGNM";
+      break;
+  }
+}
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -22,51 +55,35 @@ class _SearchScreenState extends State<SearchScreen> {
   Future<void> callAPI() async {
     List<YouTubeVideo> searchResult = [];
     String query;
+
     if (queryString != '') {
       query = queryString;
     } else {
       query = 'Chill Songs';
     }
-    searchResult = await youtube.search(
-      query,
-      type: 'video,channel,playlist',
-      order: 'relevance',
-      videoDuration: 'any',
-      //regionCode: 'VN',
-    );
-    searchResult = await youtube.nextPage();
+    print('Searching: ' + query);
+    try {
+      searchResult = await youtube.search(
+        query,
+        type: 'video, playlist',
+        //date, rating, relevance, title, videoCount, viewCount
+        order: 'relevance',
+        videoDuration: 'any',
+        regionCode: 'VN',
+      );
+    } catch (e) {
+      print('Exception handled!');
+      print(e);
+      changeAPI();
+      callAPI();
+    }
+
+    print("Searched!");
+
+    //searchResult = await youtube.nextPage();
     setState(() {
       videoResult = searchResult;
     });
-    print("searched");
-  }
-
-  void checkAPIState() {
-    setState(() {
-      state = tempState;
-    });
-
-    switch (state) {
-      case 1:
-        apiKey = key1;
-        break;
-      case 2:
-        apiKey = key2;
-        break;
-      case 3:
-        apiKey = key3;
-        break;
-      case 4:
-        apiKey = key4;
-        break;
-      case 5:
-        apiKey = key5;
-        break;
-
-      default:
-        apiKey = "AIzaSyCMReGgd5e9a7sC_PSJP0QfCYcKlT2IGNM";
-        break;
-    }
   }
 
   @override
@@ -117,20 +134,7 @@ class _SearchScreenState extends State<SearchScreen> {
               onPressed: () {
                 //Tìm kiếm và hiển thị kq
                 FocusScope.of(context).requestFocus(FocusNode());
-                try {
-                  callAPI();
-                  //nếu call aPI thất bại
-                  if (true) {
-                    throw 'call failed';
-                  }
-                } catch (e) {
-                  if (tempState < 6 && tempState > 0) {
-                    tempState++;
-                  } else {
-                    tempState = 1;
-                  }
-                }
-                checkAPIState();
+                callAPI();
               })
         ],
       ),
@@ -159,11 +163,11 @@ class _SearchScreenState extends State<SearchScreen> {
         if (cplx == 0) {
           videoHistory.add(video);
         } else {}
-        print('<----URL Thumbnails---->');
-        print(video.thumbnail.high.url);
-        print(video.thumbnail.medium.url);
-        print(video.thumbnail.small.url);
-        print('<----URL Thumbnails---->');
+        // print('<----URL Thumbnails---->');
+        // print(video.thumbnail.high.url);
+        // print(video.thumbnail.medium.url);
+        // print(video.thumbnail.small.url);
+        // print('<----URL Thumbnails---->');
       },
       child: Container(
         color: Colors.white,

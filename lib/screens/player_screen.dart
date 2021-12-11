@@ -1,14 +1,15 @@
 // ignore_for_file: no_logic_in_create_state, unnecessary_const
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:y_listener/models/channelIcon.dart';
-import 'package:y_listener/models/youtube_api.dart';
+import 'package:y_listener/models/api/channelIcon.dart';
+import 'package:y_listener/models/api/youtube_api.dart';
 import 'package:y_listener/screens/search_screen.dart';
-//import 'package:y_listener/screens/search_screen.dart';
-import 'package:youtube_api/youtube_api.dart';
-
-import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:y_listener/screens/history_video_screen.dart';
+
+//import 'package:y_listener/screens/search_screen.dart';
+
+import 'package:youtube_api/youtube_api.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class PlayerScreen extends StatefulWidget {
   const PlayerScreen({Key? key, required this.video}) : super(key: key);
@@ -29,6 +30,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   void initState() {
+    //WidgetsFlutterBinding.ensureInitialized();
     _controller = YoutubePlayerController(
       initialVideoId: videoSelect.id!,
       params: YoutubePlayerParams(
@@ -38,14 +40,30 @@ class _PlayerScreenState extends State<PlayerScreen> {
         showFullscreenButton: true,
         autoPlay: true,
         playsInline: true,
-        privacyEnhanced: true,
         strictRelatedVideos: true,
         desktopMode: true,
       ),
     );
-
+    //WidgetsBinding.instance!.addObserver(this);
     super.initState();
   }
+
+  // @override
+  // void dispose() {
+  //   print('Disposed');
+  //   _controller.close();
+  //   super.dispose();
+  // }
+
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   if (state == AppLifecycleState.resumed) {
+  //     print('Resumming...');
+  //   } else {
+  //     print('Paused');
+  //     AppLifecycleState.resumed;
+  //   }
+  // }
 
   List<String> generatorPlaylist() {
     List<String> videoPlaylist = List.empty(growable: true);
@@ -60,8 +78,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
   void selectVideo() {
     setState(() {
       videoSelect = tempVideoSelect;
-    });
-    setState(() {
       _controller = _tempController;
     });
   }

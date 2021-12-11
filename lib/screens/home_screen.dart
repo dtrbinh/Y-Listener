@@ -1,12 +1,16 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:youtube_api/youtube_api.dart';
 
 import 'package:y_listener/screens/history_video_screen.dart';
 import 'package:y_listener/screens/search_screen.dart';
 import 'package:y_listener/screens/player_screen.dart';
-import 'package:y_listener/models/youtube_api.dart';
+import 'package:y_listener/models/api/youtube_api.dart';
+import 'package:y_listener/models/api/channelIcon.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -14,33 +18,30 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-late List<YouTubeVideo> listDefault = [];
-late List<YouTubeVideo> tempListDefault = [];
-
 class _HomeScreenState extends State<HomeScreen> {
   YoutubeAPI youtube = YoutubeAPI(apiKey);
+  late List<YouTubeVideo> listDefault = [];
+  late List<YouTubeVideo> tempListDefault = [];
 
   @override
   void initState() {
+    callDefaultAPI();
     super.initState();
   }
 
-  void checkListDefault() {
+  Future<void> callDefaultAPI() async {
+    try {
+      tempListDefault = await youtube.getTrends(regionCode: 'VN');
+    } catch (e) {
+      print('Exception handled!');
+      print(e);
+      changeAPI();
+      callDefaultAPI();
+    }
+    print('Called Trending!');
     setState(() {
       listDefault = tempListDefault;
     });
-  }
-
-  Future<void> callDefaultAPI() async {
-    String query = 'Chill Songs';
-    tempListDefault = await youtube.search(
-      query,
-      type: 'video, playlist',
-      order: 'relevance',
-      videoDuration: 'any',
-      //regionCode: 'VN',
-    );
-    tempListDefault = await youtube.nextPage();
   }
 
   @override
@@ -161,13 +162,14 @@ class _HomeScreenState extends State<HomeScreen> {
               //gọi đến search screen
             },
           ),
-          IconButton(
-              onPressed: () {
-                callDefaultAPI();
-
-                checkListDefault();
-              },
-              icon: const Icon(Icons.replay_outlined)),
+          // IconButton(
+          //     onPressed: () {
+          //       callDefaultAPI();
+          //       setState(() {
+          //         listDefault = tempListDefault;
+          //       });
+          //     },
+          //     icon: const Icon(Icons.replay_outlined)),
           //Trang video lịch sử
           IconButton(
             icon: const Icon(Icons.history),
@@ -189,11 +191,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget listItemFull(YouTubeVideo video) {
+    Widget listItemFull(YouTubeVideo video) {
     return InkWell(
-      onHover: (isHovering) {
-        if (isHovering) {}
-      },
       hoverColor: Colors.black12,
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(
@@ -206,8 +205,11 @@ class _HomeScreenState extends State<HomeScreen> {
         if (cplx == 0) {
           videoHistory.add(video);
         } else {}
-
-        //print(video.thumbnail.medium.url);
+        // print('<----URL Thumbnails---->');
+        // print(video.thumbnail.high.url);
+        // print(video.thumbnail.medium.url);
+        // print(video.thumbnail.small.url);
+        // print('<----URL Thumbnails---->');
       },
       child: Container(
         color: Colors.white,
@@ -226,46 +228,104 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Container(
             margin: const EdgeInsets.only(left: 10),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    child: Text(
-                      video.title,
-                      softWrap: true,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Container(
-                      margin: const EdgeInsets.only(left: 0.0),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 0),
-                        child: Text(
-                          video.channelTitle,
-                          softWrap: true,
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                      )),
-                  Container(
-                      margin: const EdgeInsets.only(left: 0.0),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        child: Text(
-                          'Duration: ${video.duration ?? ""}',
-                          softWrap: true,
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                      )),
-                ]),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
+                    Widget>[
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                child: Text(
+                  video.title,
+                  softWrap: true,
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 10),
+                child: const Text(
+                  '28 N lượt xem' ' • ' '2 năm trước',
+                  softWrap: true,
+                  style: TextStyle(fontSize: 15),
+                ),
+              ),
+              Container(
+                  margin: const EdgeInsets.only(left: 0.0, top: 10),
+                  child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          FutureBuilder<String>(
+                            future: getChannelIcon(
+                                video.channelId!, apiKey), // async work
+                            builder: (BuildContext context,
+                                AsyncSnapshot<String> snapshot) {
+                              switch (snapshot.connectionState) {
+                                case ConnectionState.waiting:
+                                  return const CircleAvatar(
+                                    radius: 18,
+                                    backgroundImage: AssetImage(
+                                        'assets/img/loading-buffering.gif'),
+                                    backgroundColor: Colors.white,
+                                  );
+                                default:
+                                  if (snapshot.hasError) {
+                                    return const CircleAvatar(
+                                      radius: 18,
+                                      backgroundImage:
+                                          AssetImage('assets/img/alert.gif'),
+                                      backgroundColor: Colors.white,
+                                    );
+                                  } else {
+                                    return CircleAvatar(
+                                      radius: 18,
+                                      backgroundImage: NetworkImage(
+                                        snapshot.data!,
+                                      ),
+                                      backgroundColor: Colors.black12,
+                                    );
+                                  }
+                              }
+                            },
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                  margin: const EdgeInsets.only(left: 15.0),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 0, vertical: 0),
+                                    child: Text(
+                                      video.channelTitle,
+                                      softWrap: true,
+                                      style: const TextStyle(fontSize: 15),
+                                    ),
+                                  )),
+                              Container(
+                                  margin:
+                                      const EdgeInsets.only(left: 15.0, top: 5),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 0, vertical: 0),
+                                    child: Text(
+                                      'Duration: ${video.duration ?? ""}',
+                                      softWrap: true,
+                                      style: const TextStyle(fontSize: 15),
+                                    ),
+                                  )),
+                            ],
+                          ),
+                        ],
+                      ))),
+            ]),
           ),
           const Divider(
-            height: 10,
+            height: 20,
             thickness: 1,
+            color: Colors.transparent,
           ),
         ]),
       ),

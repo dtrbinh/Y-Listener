@@ -37,6 +37,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   youtube_api: ^1.0.4
   youtube_player_iframe: ^2.2.2
+  audio_service: ^0.18.1
+  just_audio: ^0.9.18
+  rxdart: '>=0.26.0 <0.28.0'
 
 dev_dependencies:
   flutter_test:

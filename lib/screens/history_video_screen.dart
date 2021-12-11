@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:y_listener/screens/player_screen.dart';
 import 'package:youtube_api/youtube_api.dart';
-import 'package:y_listener/models/youtube_api.dart';
+import 'package:y_listener/models/api/youtube_api.dart';
 
 List<YouTubeVideo> videoHistory = List.empty(growable: true);
 
