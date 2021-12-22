@@ -40,7 +40,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
         autoPlay: true,
         playsInline: true,
         strictRelatedVideos: true,
-        desktopMode: true,
+        //desktopMode: true,
       ),
     );
     //WidgetsBinding.instance!.addObserver(this);

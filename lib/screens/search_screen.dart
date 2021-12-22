@@ -35,7 +35,6 @@ void checkAPIState() {
     case 5:
       apiKey = key5;
       break;
-
     default:
       apiKey = "AIzaSyCMReGgd5e9a7sC_PSJP0QfCYcKlT2IGNM";
       break;
@@ -50,6 +49,29 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   YoutubeAPI youtube = YoutubeAPI(apiKey);
+  //late ScrollController scrollController;
+
+  // @override
+  // void initState() {
+  //   scrollController = new ScrollController()
+  //     ..addListener(() {
+  //       scrollListener();
+  //     });
+  //   super.initState();
+  // }
+
+  // Future<void> scrollListener() async {
+  //   List<YouTubeVideo> tempVideoResult = [];
+
+  //   if (videoResult != []) {
+  //     if (scrollController.position.maxScrollExtent == true) {
+  //       tempVideoResult = videoResult + await youtube.nextPage();
+  //       setState(() {
+  //         videoResult = tempVideoResult;
+  //       });
+  //     }
+  //   }
+  // }
 
   Future<void> callAPI() async {
     List<YouTubeVideo> searchResult = [];
@@ -141,6 +163,7 @@ class _SearchScreenState extends State<SearchScreen> {
         backgroundColor: Colors.white,
         body: Center(
           child: ListView(
+            //controller: scrollController,
             children: videoResult.map<Widget>(listItemFull).toList(),
           ),
         ),

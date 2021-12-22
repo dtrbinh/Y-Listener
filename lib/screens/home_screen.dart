@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> callDefaultAPI() async {
+    print('Calling trending...');
     try {
       tempListDefault = await youtube.getTrends(regionCode: 'VN');
     } catch (e) {
@@ -190,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-    Widget listItemFull(YouTubeVideo video) {
+  Widget listItemFull(YouTubeVideo video) {
     return InkWell(
       hoverColor: Colors.black12,
       onTap: () {
