@@ -49,29 +49,32 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   YoutubeAPI youtube = YoutubeAPI(apiKey);
-  //late ScrollController scrollController;
+  late ScrollController scrollController;
 
-  // @override
-  // void initState() {
-  //   scrollController = new ScrollController()
-  //     ..addListener(() {
-  //       scrollListener();
-  //     });
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    scrollController = ScrollController()
+      ..addListener(() {
+        scrollListener();
+      });
 
-  // Future<void> scrollListener() async {
-  //   List<YouTubeVideo> tempVideoResult = [];
+    super.initState();
+  }
 
-  //   if (videoResult != []) {
-  //     if (scrollController.position.maxScrollExtent == true) {
-  //       tempVideoResult = videoResult + await youtube.nextPage();
-  //       setState(() {
-  //         videoResult = tempVideoResult;
-  //       });
-  //     }
-  //   }
-  // }
+  Future<void> scrollListener() async {
+    List<YouTubeVideo> tempVideoResult = [];
+
+    if (videoResult != []) {
+      if (scrollController.position.extentAfter < 200) {
+        tempVideoResult = [];
+        tempVideoResult = videoResult + await youtube.nextPage();
+        setState(() {
+          videoResult = tempVideoResult;
+        });
+        print('Loaded next page!');
+      }
+    }
+  }
 
   Future<void> callAPI() async {
     List<YouTubeVideo> searchResult = [];
@@ -163,7 +166,7 @@ class _SearchScreenState extends State<SearchScreen> {
         backgroundColor: Colors.white,
         body: Center(
           child: ListView(
-            //controller: scrollController,
+            controller: scrollController,
             children: videoResult.map<Widget>(listItemFull).toList(),
           ),
         ),

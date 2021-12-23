@@ -183,7 +183,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       //Trending video
-      body: Center(
+      body: RefreshIndicator(
+        onRefresh: callDefaultAPI,
         child: ListView(
           children: listDefault.map<Widget>(listItemFull).toList(),
         ),

@@ -29,7 +29,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   void initState() {
-    //WidgetsFlutterBinding.ensureInitialized();
     _controller = YoutubePlayerController(
       initialVideoId: videoSelect.id!,
       params: YoutubePlayerParams(
@@ -40,10 +39,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
         autoPlay: true,
         playsInline: true,
         strictRelatedVideos: true,
-        //desktopMode: true,
+        desktopMode: true,
       ),
     );
-    //WidgetsBinding.instance!.addObserver(this);
     super.initState();
   }
 
