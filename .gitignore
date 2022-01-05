@@ -33,7 +33,9 @@
 
 # Web related
 lib/generated_plugin_registrant.dart
-lib/models/api/youtube_api.dart
+# API key
+lib/utils/youtube_api.dart
+lib/screens/settings/API.dart
 # Symbolication related
 app.*.symbols
 

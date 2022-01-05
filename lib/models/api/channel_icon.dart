@@ -2,11 +2,12 @@
 //
 //  final channelIcon = channelIconFromJson(jsonString);
 
-// ignore_for_file: avoid_print, file_names
+// ignore_for_file: avoid_print
 
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:y_listener/screens/search_screen.dart';
 
 ChannelIcon channelIconFromMap(String str) =>
     ChannelIcon.fromMap(json.decode(str));
@@ -128,18 +129,18 @@ class Default {
 
 Future<String> getChannelIcon(String channelID, String apiKey) async {
   String urlJSON = '';
+  late ChannelIcon channelIcon;
   urlJSON = 'https://www.googleapis.com/youtube/v3/channels?part=snippet&id=' +
       channelID +
       '&fields=items%2Fsnippet%2Fthumbnails&key=' +
       apiKey;
-  //print(urlJSON);
-  final response = await http.get(Uri.parse(urlJSON));
-  final channelIcon = ChannelIcon.fromMap(json.decode(response.body));
-  // print('called API');
-  // print('-----------------');
-  // print(response.body);
-  // print('URL Image here: ');
-  // print(channelIcon.items[0].snippet.thumbnails.medium.url);
-
+  try {
+    final response = await http.get(Uri.parse(urlJSON));
+    channelIcon = ChannelIcon.fromMap(json.decode(response.body));
+  } catch (e) {
+    print('Load icon error');
+    return '';
+  }
+  print('Load icon success!');
   return channelIcon.items[0].snippet.thumbnails.thumbnailsDefault.url;
 }

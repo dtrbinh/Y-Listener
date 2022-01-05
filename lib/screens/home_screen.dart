@@ -2,14 +2,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:y_listener/models/api/video_info.dart';
+import 'package:y_listener/screens/settings/settings_screen.dart';
 
 import 'package:youtube_api/youtube_api.dart';
 
 import 'package:y_listener/screens/history_video_screen.dart';
 import 'package:y_listener/screens/search_screen.dart';
 import 'package:y_listener/screens/player_screen.dart';
-import 'package:y_listener/models/api/youtube_api.dart';
-import 'package:y_listener/models/api/channelIcon.dart';
+import 'package:y_listener/models/api/channel_icon.dart';
+import 'package:y_listener/screens/settings/API.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -36,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Exception handled!');
       print(e);
       changeAPI();
+      youtube = YoutubeAPI(apiKey);
       callDefaultAPI();
     }
     print('Called Trending!');
@@ -105,9 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(fontSize: 17),
               ),
               onTap: () {
-                //Quay về hompage
                 Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const APIKey()));
+                    MaterialPageRoute(builder: (context) => const Settings()));
               },
             ),
             const Divider(
@@ -118,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: const Icon(Icons.logout_outlined),
               title: const Text(
                 'Đăng xuất',
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 17),
               ),
               onTap: () {
                 //Quay về hompage
@@ -129,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: const Icon(Icons.subdirectory_arrow_left_sharp),
               title: const Text(
                 'Thoát',
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 17),
               ),
               onTap: () {
                 //Quay về hompage
@@ -206,26 +208,47 @@ class _HomeScreenState extends State<HomeScreen> {
         if (cplx == 0) {
           videoHistory.add(video);
         } else {}
-        // print('<----URL Thumbnails---->');
-        // print(video.thumbnail.high.url);
-        // print(video.thumbnail.medium.url);
-        // print(video.thumbnail.small.url);
-        // print('<----URL Thumbnails---->');
       },
       child: Container(
         color: Colors.white,
         child: Column(children: <Widget>[
           SizedBox(
             width: MediaQuery.of(context).size.width,
-            child: Center(
-                child: Container(
-              color: Colors.white,
-              child: Image.network(
-                video.thumbnail.medium.url ?? '',
-                width: MediaQuery.of(context).size.width,
-                scale: 0.8,
-              ),
-            )),
+            child: Stack(
+              alignment: AlignmentDirectional.bottomEnd,
+              children: <Widget>[
+                Container(
+                  color: Colors.white,
+                  child: Image.network(
+                    video.thumbnail.medium.url ?? '',
+                    width: MediaQuery.of(context).size.width,
+                    scale: 0.8,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Container(
+                      width: 60,
+                      height: 25,
+                      decoration: BoxDecoration(
+                        color: Colors.black38,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Center(
+                          child: Padding(
+                        padding: const EdgeInsets.all(0),
+                        child: Text(
+                          video.duration ?? '',
+                          softWrap: true,
+                          style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                      ))),
+                ),
+              ],
+            ),
           ),
           Container(
             margin: const EdgeInsets.only(left: 10),
@@ -243,13 +266,36 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Container(
-                margin: const EdgeInsets.only(left: 10),
-                child: const Text(
-                  '28 N lượt xem' ' • ' '2 năm trước',
-                  softWrap: true,
-                  style: TextStyle(fontSize: 15),
-                ),
-              ),
+                  margin: const EdgeInsets.only(left: 10),
+                  child: FutureBuilder<String>(
+                    future: getViewCount(video.id!, apiKey), // async work
+                    builder:
+                        (BuildContext context, AsyncSnapshot<String> snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.waiting:
+                          return const Text(
+                            '',
+                            softWrap: true,
+                            style: TextStyle(fontSize: 15),
+                          );
+                        default:
+                          if (snapshot.hasError) {
+                            return const Text(
+                              '',
+                              softWrap: true,
+                              style: TextStyle(fontSize: 15),
+                            );
+                          } else {
+                            return Text(
+                              snapshot.data! + ' lượt xem ' '•' ' 2 năm trước',
+                              //'28 N lượt xem' ' • ' '2 năm trước',
+                              softWrap: true,
+                              style: const TextStyle(fontSize: 15),
+                            );
+                          }
+                      }
+                    },
+                  )),
               Container(
                   margin: const EdgeInsets.only(left: 0.0, top: 10),
                   child: Padding(
@@ -301,18 +347,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                         horizontal: 0, vertical: 0),
                                     child: Text(
                                       video.channelTitle,
-                                      softWrap: true,
-                                      style: const TextStyle(fontSize: 15),
-                                    ),
-                                  )),
-                              Container(
-                                  margin:
-                                      const EdgeInsets.only(left: 15.0, top: 5),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 0, vertical: 0),
-                                    child: Text(
-                                      'Duration: ${video.duration ?? ""}',
                                       softWrap: true,
                                       style: const TextStyle(fontSize: 15),
                                     ),

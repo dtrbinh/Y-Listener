@@ -1,9 +1,10 @@
 // ignore_for_file: no_logic_in_create_state, unnecessary_const
 import 'package:flutter/material.dart';
-import 'package:y_listener/models/api/channelIcon.dart';
-import 'package:y_listener/models/api/youtube_api.dart';
+import 'package:y_listener/models/api/channel_icon.dart';
+import 'package:y_listener/models/api/video_info.dart';
 import 'package:y_listener/screens/search_screen.dart';
 import 'package:y_listener/screens/history_video_screen.dart';
+import 'package:y_listener/screens/settings/API.dart';
 
 //import 'package:y_listener/screens/search_screen.dart';
 
@@ -39,28 +40,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
         autoPlay: true,
         playsInline: true,
         strictRelatedVideos: true,
-        desktopMode: true,
+        //desktopMode: true,
       ),
     );
     super.initState();
   }
-
-  // @override
-  // void dispose() {
-  //   print('Disposed');
-  //   _controller.close();
-  //   super.dispose();
-  // }
-
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   if (state == AppLifecycleState.resumed) {
-  //     print('Resumming...');
-  //   } else {
-  //     print('Paused');
-  //     AppLifecycleState.resumed;
-  //   }
-  // }
 
   List<String> generatorPlaylist() {
     List<String> videoPlaylist = List.empty(growable: true);
@@ -429,7 +413,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
       hoverColor: Colors.black12,
       onTap: () {
         _controller.stop();
-        Navigator.pop(context);
+        //Navigator.pop(context);
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => PlayerScreen(video: video)));
 
@@ -452,13 +436,40 @@ class _PlayerScreenState extends State<PlayerScreen> {
           SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Center(
-                child: Container(
-              color: Colors.white,
-              child: Image.network(
-                video.thumbnail.medium.url ?? '',
-                width: MediaQuery.of(context).size.width,
-                scale: 0.8,
-              ),
+                child: Stack(
+              alignment: AlignmentDirectional.bottomEnd,
+              children: <Widget>[
+                Container(
+                  color: Colors.white,
+                  child: Image.network(
+                    video.thumbnail.medium.url ?? '',
+                    width: MediaQuery.of(context).size.width,
+                    scale: 0.8,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Container(
+                      width: 60,
+                      height: 25,
+                      decoration: BoxDecoration(
+                        color: Colors.black38,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Center(
+                          child: Padding(
+                        padding: const EdgeInsets.all(0),
+                        child: Text(
+                          video.duration ?? '',
+                          softWrap: true,
+                          style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                      ))),
+                ),
+              ],
             )),
           ),
           Container(
@@ -474,6 +485,38 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   softWrap: true,
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10, left: 10),
+                child: FutureBuilder<String>(
+                  future: getViewCount(video.id!, apiKey), // async work
+                  builder:
+                      (BuildContext context, AsyncSnapshot<String> snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return const Text(
+                          '',
+                          softWrap: true,
+                          style: TextStyle(fontSize: 17),
+                        );
+                      default:
+                        if (snapshot.hasError) {
+                          return const Text(
+                            '',
+                            softWrap: true,
+                            style: TextStyle(fontSize: 17),
+                          );
+                        } else {
+                          return Text(
+                            snapshot.data! + ' lượt xem ' '•' ' 2 năm trước',
+                            //'28 N lượt xem' ' • ' '2 năm trước',
+                            softWrap: true,
+                            style: const TextStyle(fontSize: 17),
+                          );
+                        }
+                    }
+                  },
                 ),
               ),
               Container(
@@ -520,28 +563,23 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           Container(
                             margin: const EdgeInsets.only(left: 10),
                             child: Text(
-                              video.channelTitle +
-                                  ' • ' +
-                                  '38 N lượt xem' +
-                                  ' • ' +
-                                  '2 năm trước',
+                              video.channelTitle,
                               softWrap: true,
-                              style: const TextStyle(fontSize: 15),
+                              style: const TextStyle(fontSize: 17),
                             ),
-                          )
+                          ),
+                          // Container(
+                          //     child: Padding(
+                          //       padding: const EdgeInsets.symmetric(
+                          //           horizontal: 10, vertical: 0),
+                          //       child: Text(
+                          //         'Duration: ${video.duration ?? ""}',
+                          //         softWrap: true,
+                          //         style: const TextStyle(fontSize: 15),
+                          //       ),
+                          //     )),
                         ],
                       ))),
-              Container(
-                  margin: const EdgeInsets.only(left: 50.0),
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                    child: Text(
-                      'Duration: ${video.duration ?? ""}',
-                      softWrap: true,
-                      style: const TextStyle(fontSize: 15),
-                    ),
-                  )),
             ]),
           ),
           const Padding(

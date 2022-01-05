@@ -1,7 +1,7 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'package:y_listener/screens/home_screen.dart';
+import 'package:youtube_api/youtube_api.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,10 +14,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: _title,
-      home: HomeScreen(),
+    return ChangeNotifierProvider(
+      create: (ctx) => VideoInfor(),
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: _title,
+        home: HomeScreen(),
+      ),
       //home: HomeScreen(),
     );
   }
+}
+
+class VideoInfor with ChangeNotifier {
+  List<YouTubeVideo> searchResult = List.empty(growable: true);
+  List<YouTubeVideo> trendResult = List.empty(growable: true);
+  List<YouTubeVideo> historyVideo = List.empty(growable: true);
+  List<String> historySearch = List.empty(growable: true);
+  late int apiKey = 1;
+  late String regionCode = 'EN';
 }
