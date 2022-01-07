@@ -7,7 +7,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:y_listener/screens/search_screen.dart';
 
 ChannelIcon channelIconFromMap(String str) =>
     ChannelIcon.fromMap(json.decode(str));

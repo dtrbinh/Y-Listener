@@ -236,7 +236,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           );
                         } else {
                           return Text(
-                            snapshot.data! + ' lượt xem ' '•' ' 2 năm trước',
+                            snapshot.data! + ' lượt xem ' '• ' + dayPublish(video.publishedAt!) ,
                             //'28 N lượt xem' ' • ' '2 năm trước',
                             softWrap: true,
                             style: const TextStyle(fontSize: 15),

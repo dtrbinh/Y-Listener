@@ -7,7 +7,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:y_listener/screens/search_screen.dart';
 
 VideoInfor videoInforFromJson(String str) =>
     VideoInfor.fromJson(json.decode(str));
@@ -153,13 +152,56 @@ String convertCount(int viewCount) {
 }
 
 String dayPublish(String daytime) {
-  //EX: 2021-12-29T13:00:14Z
-  //Struc: yyyy-mm-dd T hh:mm:ss Z
-  late String publishDay = '0';
-  // phút trước
-  // giờ trước
-  // ngày trước
-  // tháng trước
-  // năm trước
-  return publishDay;
+  //Struct: 'yyy-mm-ddThh:mm:ssZ'
+  late String result = '';
+  DateTime current = DateTime.now();
+
+  final year = int.parse(daytime.substring(0, 4));
+  final month = int.parse(daytime.substring(5, 7));
+  final day = int.parse(daytime.substring(8, 10));
+  final hour = int.parse(daytime.substring(11, 13));
+  final minute = int.parse(daytime.substring(14, 16));
+  final second = int.parse(daytime.substring(17, 19));
+  DateTime videoDay = DateTime(year, month, day, hour, minute, second);
+
+  if (videoDay.year == current.year) {
+    if (videoDay.month == current.month) {
+      if (videoDay.day == current.day) {
+        if (videoDay.hour == current.hour) {
+          if (videoDay.minute == current.minute) {
+            if (videoDay.second == current.second) {
+              result = 'Vừa xong';
+            } else {
+              result =
+                  (current.second - videoDay.second).toString() + ' giây trước';
+            }
+          } else {
+            result =
+                (current.minute - videoDay.minute).toString() + ' phút trước';
+          }
+        } else {
+          result = (current.hour - videoDay.hour).toString() + ' giờ trước';
+        }
+      } else {
+        result = (current.day - videoDay.day).toString() + ' ngày trước';
+      }
+    } else {
+      result = (current.month - videoDay.month).toString() + ' tháng trước';
+    }
+  } else {
+    result = (current.year - videoDay.year).toString() + ' năm trước';
+  }
+//   print(videoDay.toString());
+//   print(current.toString());
+//   print('Difference: $result');
+  return result;
+}
+
+class PublishDay {
+  int year = 0;
+  int month = 0;
+  int day = 0;
+  int hour = 0;
+  int minute = 0;
+  int second = 0;
 }
