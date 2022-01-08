@@ -66,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               decoration: BoxDecoration(
                 color: Colors.red,
+                //color: Color.fromRGBO(255, 0, 0, 1),
               ),
             ),
             ListTile(
@@ -93,12 +94,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ListTile(
               leading: const Icon(Icons.history_edu),
               title: const Text(
-                'Lịch sử tìm kiếm',
+                'Lịch sử',
                 style: TextStyle(fontSize: 17),
               ),
               onTap: () {
-                //Quay về hompage
-                Navigator.pop(context);
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const HistoryScreen()));
               },
             ),
             ListTile(
@@ -152,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
               }),
         ),
         title: const Text('Y Listener'),
-        backgroundColor: const Color.fromRGBO(255, 0, 0, 100),
+        backgroundColor: Colors.red,
         actions: <Widget>[
           //Thanh tìm kiếm
           IconButton(
@@ -164,24 +165,15 @@ class _HomeScreenState extends State<HomeScreen> {
               //gọi đến search screen
             },
           ),
-          // IconButton(
-          //     onPressed: () {
-          //       callDefaultAPI();
-          //       setState(() {
-          //         listDefault = tempListDefault;
-          //       });
-          //     },
-          //     icon: const Icon(Icons.replay_outlined)),
           //Trang video lịch sử
-          IconButton(
-            icon: const Icon(Icons.history),
-            tooltip: 'History video',
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const HistoryScreen()));
-              //Gọi history video
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.history),
+          //   tooltip: 'History video',
+          //   onPressed: () {
+          //     Navigator.of(context).push(MaterialPageRoute(
+          //         builder: (context) => const HistoryScreen()));
+          //   },
+          // ),
         ],
       ),
       //Trending video

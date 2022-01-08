@@ -10,7 +10,6 @@ import 'package:y_listener/models/api/video_info.dart';
 
 List<YouTubeVideo> videoResult = [];
 
-
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
   @override
@@ -88,7 +87,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   Navigator.pop(context);
                 },
                 icon: const Icon(Icons.arrow_back))),
-        backgroundColor: const Color.fromRGBO(255, 0, 0, 100),
+        backgroundColor: Colors.red,
         title: Container(
           height: 40,
           width: MediaQuery.of(context).size.width,
@@ -122,11 +121,11 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
         actions: [
           IconButton(
-              icon: const Icon(Icons.send),
+              icon: const Icon(Icons.mic),
               onPressed: () {
                 //Tìm kiếm và hiển thị kq
                 FocusScope.of(context).requestFocus(FocusNode());
-                callAPI();
+                //callAPI();
               })
         ],
       ),
@@ -201,111 +200,113 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           Container(
             margin: const EdgeInsets.only(left: 10),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
-                    Widget>[
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: Text(
-                  video.title,
-                  softWrap: true,
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(left: 10),
-                child: FutureBuilder<String>(
-                  future: getViewCount(video.id!, apiKey), // async work
-                  builder:
-                      (BuildContext context, AsyncSnapshot<String> snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                        return const Text(
-                          '',
-                          softWrap: true,
-                          style: TextStyle(fontSize: 15),
-                        );
-                      default:
-                        if (snapshot.hasError) {
-                          return const Text(
-                            '',
-                            softWrap: true,
-                            style: TextStyle(fontSize: 15),
-                          );
-                        } else {
-                          return Text(
-                            snapshot.data! + ' lượt xem ' '• ' + dayPublish(video.publishedAt!) ,
-                            //'28 N lượt xem' ' • ' '2 năm trước',
-                            softWrap: true,
-                            style: const TextStyle(fontSize: 15),
-                          );
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    child: Text(
+                      video.title,
+                      softWrap: true,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 10),
+                    child: FutureBuilder<String>(
+                      future: getViewCount(video.id!, apiKey), // async work
+                      builder: (BuildContext context,
+                          AsyncSnapshot<String> snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.waiting:
+                            return const Text(
+                              '',
+                              softWrap: true,
+                              style: TextStyle(fontSize: 15),
+                            );
+                          default:
+                            if (snapshot.hasError) {
+                              return const Text(
+                                '',
+                                softWrap: true,
+                                style: TextStyle(fontSize: 15),
+                              );
+                            } else {
+                              return Text(
+                                snapshot.data! +
+                                    ' lượt xem ' '• ' +
+                                    dayPublish(video.publishedAt!),
+                                //'28 N lượt xem' ' • ' '2 năm trước',
+                                softWrap: true,
+                                style: const TextStyle(fontSize: 15),
+                              );
+                            }
                         }
-                    }
-                  },
-                ),
-              ),
-              Container(
-                  margin: const EdgeInsets.only(left: 0.0, top: 10),
-                  child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          FutureBuilder<String>(
-                            future: getChannelIcon(
-                                video.channelId!, apiKey), // async work
-                            builder: (BuildContext context,
-                                AsyncSnapshot<String> snapshot) {
-                              switch (snapshot.connectionState) {
-                                case ConnectionState.waiting:
-                                  return const CircleAvatar(
-                                    radius: 18,
-                                    backgroundImage: AssetImage(
-                                        'assets/img/loading-buffering.gif'),
-                                    backgroundColor: Colors.white,
-                                  );
-                                default:
-                                  if (snapshot.hasError) {
-                                    return const CircleAvatar(
-                                      radius: 18,
-                                      backgroundImage:
-                                          AssetImage('assets/img/alert.gif'),
-                                      backgroundColor: Colors.white,
-                                    );
-                                  } else {
-                                    return CircleAvatar(
-                                      radius: 18,
-                                      backgroundImage: NetworkImage(
-                                        snapshot.data!,
-                                      ),
-                                      backgroundColor: Colors.black12,
-                                    );
-                                  }
-                              }
-                            },
-                          ),
-                          Column(
+                      },
+                    ),
+                  ),
+                  Container(
+                      margin: const EdgeInsets.only(left: 0.0, top: 10),
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 0),
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                  margin: const EdgeInsets.only(left: 15.0),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 0, vertical: 0),
-                                    child: Text(
-                                      video.channelTitle,
-                                      softWrap: true,
-                                      style: const TextStyle(fontSize: 15),
-                                    ),
-                                  )),
+                            children: <Widget>[
+                              FutureBuilder<String>(
+                                future: getChannelIcon(
+                                    video.channelId!, apiKey), // async work
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<String> snapshot) {
+                                  switch (snapshot.connectionState) {
+                                    case ConnectionState.waiting:
+                                      return const CircleAvatar(
+                                        radius: 18,
+                                        backgroundImage: AssetImage(
+                                            'assets/img/loading-buffering.gif'),
+                                        backgroundColor: Colors.white,
+                                      );
+                                    default:
+                                      if (snapshot.hasError) {
+                                        return const CircleAvatar(
+                                          radius: 18,
+                                          backgroundImage: AssetImage(
+                                              'assets/img/alert.gif'),
+                                          backgroundColor: Colors.white,
+                                        );
+                                      } else {
+                                        return CircleAvatar(
+                                          radius: 18,
+                                          backgroundImage: NetworkImage(
+                                            snapshot.data!,
+                                          ),
+                                          backgroundColor: Colors.black12,
+                                        );
+                                      }
+                                  }
+                                },
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                      margin: const EdgeInsets.only(left: 15.0),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 0, vertical: 0),
+                                        child: Text(
+                                          video.channelTitle,
+                                          softWrap: true,
+                                          style: const TextStyle(fontSize: 15),
+                                        ),
+                                      )),
+                                ],
+                              ),
                             ],
-                          ),
-                        ],
-                      ))),
-            ]),
+                          ))),
+                ]),
           ),
           const Divider(
             height: 20,
