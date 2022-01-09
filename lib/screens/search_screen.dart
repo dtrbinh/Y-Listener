@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:y_listener/models/state%20management/app_variable.dart';
 import 'package:youtube_api/youtube_api.dart';
 import 'package:y_listener/screens/player_screen.dart';
 import 'package:y_listener/utils/youtube_api.dart';
@@ -7,8 +9,6 @@ import 'package:y_listener/models/api/channel_icon.dart';
 import 'package:y_listener/screens/history_video_screen.dart';
 import 'package:y_listener/screens/settings/API.dart';
 import 'package:y_listener/models/api/video_info.dart';
-
-List<YouTubeVideo> videoResult = [];
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -30,51 +30,16 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<void> scrollListener() async {
-    List<YouTubeVideo> tempVideoResult = [];
-
+    var videoResult =
+        Provider.of<AppVariable>(context, listen: false).searchResult;
     if (videoResult != []) {
       if (scrollController.position.extentAfter < 200) {
-        tempVideoResult = [];
-        tempVideoResult = videoResult + await youtube.nextPage();
-        setState(() {
-          videoResult = tempVideoResult;
-        });
+        Provider.of<AppVariable>(context, listen: false).searchResult.clear();
+        Provider.of<AppVariable>(context, listen: false).searchResult =
+            videoResult + await youtube.nextPage();
         print('Loaded next page!');
       }
     }
-  }
-
-  Future<void> callAPI() async {
-    List<YouTubeVideo> searchResult = [];
-    String query;
-
-    if (queryString != '') {
-      query = queryString;
-    } else {
-      query = 'Chill Songs';
-    }
-    print('Searching: ' + query);
-    try {
-      searchResult = await youtube.search(
-        query,
-        type: 'video, playlist',
-        //date, rating, relevance, title, videoCount, viewCount
-        order: 'relevance',
-        videoDuration: 'any',
-        regionCode: 'VN',
-      );
-    } catch (e) {
-      print('Exception handled!');
-      print(e);
-      changeAPI();
-      youtube = YoutubeAPI(apiKey);
-      callAPI();
-    }
-    print("Searched!");
-    //searchResult = await youtube.nextPage();
-    setState(() {
-      videoResult = searchResult;
-    });
   }
 
   @override
@@ -106,7 +71,7 @@ class _SearchScreenState extends State<SearchScreen> {
             onFieldSubmitted: (text) {
               if (text == "") text = "Chill Songs";
               FocusScope.of(context).requestFocus(FocusNode());
-              callAPI();
+              Provider.of<AppVariable>(context, listen: false).callAPI(text);
               //Hàm search + hiển thị kq
             },
             textAlign: TextAlign.left,
@@ -131,12 +96,14 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: Scaffold(
         backgroundColor: Colors.white,
-        body: Center(
-          child: ListView(
-            controller: scrollController,
-            children: videoResult.map<Widget>(listItemFull).toList(),
-          ),
-        ),
+        body: Center(child: Consumer<AppVariable>(
+          builder: (context, value, child) {
+            return ListView(
+              controller: scrollController,
+              children: value.searchResult.map<Widget>(listItemFull).toList(),
+            );
+          },
+        )),
       ),
     );
   }

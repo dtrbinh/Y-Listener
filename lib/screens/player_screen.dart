@@ -1,8 +1,9 @@
 // ignore_for_file: no_logic_in_create_state, unnecessary_const
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:y_listener/models/api/channel_icon.dart';
 import 'package:y_listener/models/api/video_info.dart';
-import 'package:y_listener/screens/search_screen.dart';
+import 'package:y_listener/models/state%20management/app_variable.dart';
 import 'package:y_listener/screens/history_video_screen.dart';
 import 'package:y_listener/screens/settings/API.dart';
 
@@ -47,6 +48,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 
   List<String> generatorPlaylist() {
+    var videoResult =
+        Provider.of<AppVariable>(context, listen: false).searchResult;
     List<String> videoPlaylist = List.empty(growable: true);
     YouTubeVideo vid;
     for (int i = 0; i < videoResult.length; i++) {
@@ -396,9 +399,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     thickness: 0,
                     color: Colors.transparent,
                   )),
-              Column(
-                children: videoResult.map<Widget>(listItemFull).toList(),
-              ),
+              Consumer<AppVariable>(
+                builder: (context, value, child) {
+                  return Column(
+                    children:
+                        value.searchResult.map<Widget>(listItemFull).toList(),
+                  );
+                },
+              )
             ]
                 //scrollDirection: Axis.vertical,
                 ),
@@ -474,113 +482,115 @@ class _PlayerScreenState extends State<PlayerScreen> {
           ),
           Container(
             margin: const EdgeInsets.only(left: 10),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
-                    Widget>[
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: Text(
-                  video.title,
-                  softWrap: true,
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10, left: 10),
-                child: FutureBuilder<String>(
-                  future: getViewCount(video.id!, apiKey), // async work
-                  builder:
-                      (BuildContext context, AsyncSnapshot<String> snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                        return const Text(
-                          '',
-                          softWrap: true,
-                          style: TextStyle(fontSize: 17),
-                        );
-                      default:
-                        if (snapshot.hasError) {
-                          return const Text(
-                            '',
-                            softWrap: true,
-                            style: TextStyle(fontSize: 17),
-                          );
-                        } else {
-                          return Text(
-                            snapshot.data! + ' lượt xem ' '• ' + dayPublish(video.publishedAt!),
-                            //'28 N lượt xem' ' • ' '2 năm trước',
-                            softWrap: true,
-                            style: const TextStyle(fontSize: 17),
-                          );
-                        }
-                    }
-                  },
-                ),
-              ),
-              Container(
-                  margin: const EdgeInsets.only(left: 0.0),
-                  child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          FutureBuilder<String>(
-                            future: getChannelIcon(
-                                video.channelId!, apiKey), // async work
-                            builder: (BuildContext context,
-                                AsyncSnapshot<String> snapshot) {
-                              switch (snapshot.connectionState) {
-                                case ConnectionState.waiting:
-                                  return const CircleAvatar(
-                                    radius: 15,
-                                    backgroundImage: AssetImage(
-                                        'assets/img/loading-buffering.gif'),
-                                    backgroundColor: Colors.white,
-                                  );
-                                default:
-                                  if (snapshot.hasError) {
-                                    return const CircleAvatar(
-                                      radius: 15,
-                                      backgroundImage:
-                                          AssetImage('assets/img/alert.gif'),
-                                      backgroundColor: Colors.white,
-                                    );
-                                  } else {
-                                    return CircleAvatar(
-                                      radius: 15,
-                                      backgroundImage: NetworkImage(
-                                        snapshot.data!,
-                                      ),
-                                      backgroundColor: Colors.black12,
-                                    );
-                                  }
-                              }
-                            },
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(left: 10),
-                            child: Text(
-                              video.channelTitle,
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    child: Text(
+                      video.title,
+                      softWrap: true,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10, left: 10),
+                    child: FutureBuilder<String>(
+                      future: getViewCount(video.id!, apiKey), // async work
+                      builder: (BuildContext context,
+                          AsyncSnapshot<String> snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.waiting:
+                            return const Text(
+                              '',
                               softWrap: true,
-                              style: const TextStyle(fontSize: 17),
-                            ),
-                          ),
-                          // Container(
-                          //     child: Padding(
-                          //       padding: const EdgeInsets.symmetric(
-                          //           horizontal: 10, vertical: 0),
-                          //       child: Text(
-                          //         'Duration: ${video.duration ?? ""}',
-                          //         softWrap: true,
-                          //         style: const TextStyle(fontSize: 15),
-                          //       ),
-                          //     )),
-                        ],
-                      ))),
-            ]),
+                              style: TextStyle(fontSize: 17),
+                            );
+                          default:
+                            if (snapshot.hasError) {
+                              return const Text(
+                                '',
+                                softWrap: true,
+                                style: TextStyle(fontSize: 17),
+                              );
+                            } else {
+                              return Text(
+                                snapshot.data! +
+                                    ' lượt xem ' '• ' +
+                                    dayPublish(video.publishedAt!),
+                                //'28 N lượt xem' ' • ' '2 năm trước',
+                                softWrap: true,
+                                style: const TextStyle(fontSize: 17),
+                              );
+                            }
+                        }
+                      },
+                    ),
+                  ),
+                  Container(
+                      margin: const EdgeInsets.only(left: 0.0),
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              FutureBuilder<String>(
+                                future: getChannelIcon(
+                                    video.channelId!, apiKey), // async work
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<String> snapshot) {
+                                  switch (snapshot.connectionState) {
+                                    case ConnectionState.waiting:
+                                      return const CircleAvatar(
+                                        radius: 15,
+                                        backgroundImage: AssetImage(
+                                            'assets/img/loading-buffering.gif'),
+                                        backgroundColor: Colors.white,
+                                      );
+                                    default:
+                                      if (snapshot.hasError) {
+                                        return const CircleAvatar(
+                                          radius: 15,
+                                          backgroundImage: AssetImage(
+                                              'assets/img/alert.gif'),
+                                          backgroundColor: Colors.white,
+                                        );
+                                      } else {
+                                        return CircleAvatar(
+                                          radius: 15,
+                                          backgroundImage: NetworkImage(
+                                            snapshot.data!,
+                                          ),
+                                          backgroundColor: Colors.black12,
+                                        );
+                                      }
+                                  }
+                                },
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(left: 10),
+                                child: Text(
+                                  video.channelTitle,
+                                  softWrap: true,
+                                  style: const TextStyle(fontSize: 17),
+                                ),
+                              ),
+                              // Container(
+                              //     child: Padding(
+                              //       padding: const EdgeInsets.symmetric(
+                              //           horizontal: 10, vertical: 0),
+                              //       child: Text(
+                              //         'Duration: ${video.duration ?? ""}',
+                              //         softWrap: true,
+                              //         style: const TextStyle(fontSize: 15),
+                              //       ),
+                              //     )),
+                            ],
+                          ))),
+                ]),
           ),
           const Padding(
             padding: EdgeInsets.only(top: 5, bottom: 5),
