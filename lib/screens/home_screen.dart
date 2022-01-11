@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -84,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(fontSize: 17),
               ),
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
+                Navigator.of(context).push(CupertinoPageRoute(
                     builder: (context) => const HistoryScreen()));
               },
             ),
@@ -97,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               onTap: () {
                 Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const Settings()));
+                    CupertinoPageRoute(builder: (context) => const Settings()));
               },
             ),
             const Divider(
@@ -154,15 +155,6 @@ class _HomeScreenState extends State<HomeScreen> {
               //gọi đến search screen
             },
           ),
-          //Trang video lịch sử
-          // IconButton(
-          //   icon: const Icon(Icons.history),
-          //   tooltip: 'History video',
-          //   onPressed: () {
-          //     Navigator.of(context).push(MaterialPageRoute(
-          //         builder: (context) => const HistoryScreen()));
-          //   },
-          // ),
         ],
       ),
       //Trending video
@@ -188,14 +180,8 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => PlayerScreen(video: video)));
-
-        int cplx = 0;
-        for (int i = 0; i < videoHistory.length; i++) {
-          if (video.id == videoHistory[i].id) cplx++;
-        }
-        if (cplx == 0) {
-          videoHistory.add(video);
-        } else {}
+        Provider.of<AppVariable>(context, listen: false)
+            .extendHistoryVideo(video);
       },
       child: Container(
         color: Colors.white,

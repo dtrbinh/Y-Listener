@@ -4,9 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:y_listener/models/state%20management/app_variable.dart';
 import 'package:youtube_api/youtube_api.dart';
 import 'package:y_listener/screens/player_screen.dart';
-import 'package:y_listener/utils/youtube_api.dart';
 import 'package:y_listener/models/api/channel_icon.dart';
-import 'package:y_listener/screens/history_video_screen.dart';
 import 'package:y_listener/screens/settings/API.dart';
 import 'package:y_listener/models/api/video_info.dart';
 
@@ -30,15 +28,9 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<void> scrollListener() async {
-    var videoResult =
-        Provider.of<AppVariable>(context, listen: false).searchResult;
-    if (videoResult != []) {
-      if (scrollController.position.extentAfter < 200) {
-        Provider.of<AppVariable>(context, listen: false).searchResult.clear();
-        Provider.of<AppVariable>(context, listen: false).searchResult =
-            videoResult + await youtube.nextPage();
-        print('Loaded next page!');
-      }
+    if (Provider.of<AppVariable>(context, listen: false).searchResult != []) {
+      Provider.of<AppVariable>(context, listen: false)
+          .extendSearchResult(scrollController);
     }
   }
 
@@ -64,7 +56,8 @@ class _SearchScreenState extends State<SearchScreen> {
           child: TextFormField(
             maxLines: 1,
             onChanged: (text) {
-              queryString = text;
+              Provider.of<AppVariable>(context, listen: false).queryString =
+                  text;
               if (text == "") text = "Chill Songs";
             },
             autofocus: false,
@@ -114,14 +107,8 @@ class _SearchScreenState extends State<SearchScreen> {
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => PlayerScreen(video: video)));
-
-        int cplx = 0;
-        for (int i = 0; i < videoHistory.length; i++) {
-          if (video.id == videoHistory[i].id) cplx++;
-        }
-        if (cplx == 0) {
-          videoHistory.add(video);
-        } else {}
+        Provider.of<AppVariable>(context, listen: false)
+            .extendHistoryVideo(video);
       },
       child: Container(
         color: Colors.white,
@@ -189,14 +176,14 @@ class _SearchScreenState extends State<SearchScreen> {
                         switch (snapshot.connectionState) {
                           case ConnectionState.waiting:
                             return const Text(
-                              '',
+                              '0',
                               softWrap: true,
                               style: TextStyle(fontSize: 15),
                             );
                           default:
                             if (snapshot.hasError) {
                               return const Text(
-                                '',
+                                '0',
                                 softWrap: true,
                                 style: TextStyle(fontSize: 15),
                               );

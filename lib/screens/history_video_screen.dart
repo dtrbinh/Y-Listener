@@ -1,11 +1,10 @@
 // ignore_for_file: file_names, avoid_print
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:y_listener/models/state%20management/app_variable.dart';
 import 'package:y_listener/screens/player_screen.dart';
 import 'package:y_listener/screens/settings/API.dart';
 import 'package:youtube_api/youtube_api.dart';
-
-
-List<YouTubeVideo> videoHistory = List.empty(growable: true);
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({Key? key}) : super(key: key);
@@ -15,16 +14,6 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   YoutubeAPI youtube = YoutubeAPI(apiKey);
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  void checkVideoHistory() {
-    setState(() {
-      videoHistory = [];
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,17 +31,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
         actions: [
           IconButton(
               onPressed: () {
-                checkVideoHistory();
+                Provider.of<AppVariable>(context, listen: false)
+                    .deleteVideoHistory();
               },
               icon: const Icon(Icons.delete))
         ],
       ),
       body: Container(
-        color: Colors.white,
-        child: ListView(
-          children: videoHistory.map<Widget>(listItem).toList(),
-        ),
-      ),
+          color: Colors.white,
+          child: Consumer<AppVariable>(
+            builder: (context, value, child) {
+              return ListView(
+                children: value.historyVideo.map<Widget>(listItem).toList(),
+              );
+            },
+          )),
     );
   }
 

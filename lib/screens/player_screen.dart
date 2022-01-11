@@ -1,4 +1,4 @@
-// ignore_for_file: no_logic_in_create_state, unnecessary_const
+// ignore_for_file: no_logic_in_create_state, unnecessary_const, avoid_print
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:y_listener/models/api/channel_icon.dart';
@@ -6,8 +6,6 @@ import 'package:y_listener/models/api/video_info.dart';
 import 'package:y_listener/models/state%20management/app_variable.dart';
 import 'package:y_listener/screens/history_video_screen.dart';
 import 'package:y_listener/screens/settings/API.dart';
-
-//import 'package:y_listener/screens/search_screen.dart';
 
 import 'package:youtube_api/youtube_api.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
@@ -26,16 +24,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
   late YoutubePlayerController _controller;
   late YouTubeVideo videoSelect;
 
-  late YoutubePlayerController _tempController;
-  late YouTubeVideo tempVideoSelect;
-
   @override
   void initState() {
+    print('Generating...');
     _controller = YoutubePlayerController(
       initialVideoId: videoSelect.id!,
-      params: YoutubePlayerParams(
-        playlist: generatorPlaylist(), // Defining custom playlist
-        startAt: const Duration(seconds: 0),
+      params: const YoutubePlayerParams(
+        playlist: [], // Defining custom playlist
+        startAt: Duration(seconds: 0),
         showControls: true,
         showFullscreenButton: true,
         autoPlay: true,
@@ -44,26 +40,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
         //desktopMode: true,
       ),
     );
+    print('Generated!');
     super.initState();
-  }
-
-  List<String> generatorPlaylist() {
-    var videoResult =
-        Provider.of<AppVariable>(context, listen: false).searchResult;
-    List<String> videoPlaylist = List.empty(growable: true);
-    YouTubeVideo vid;
-    for (int i = 0; i < videoResult.length; i++) {
-      vid = videoResult[i];
-      videoPlaylist.add(vid.id ?? "");
-    }
-    return videoPlaylist;
-  }
-
-  void selectVideo() {
-    setState(() {
-      videoSelect = tempVideoSelect;
-      _controller = _tempController;
-    });
   }
 
   @override
@@ -380,7 +358,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 5.0, horizontal: 15),
                 child: Text(
-                  videoSelect.description ?? "no description",
+                  videoSelect.description ?? "No description",
                   style: const TextStyle(fontSize: 16),
                   softWrap: true,
                 ),
@@ -407,9 +385,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   );
                 },
               )
-            ]
-                //scrollDirection: Axis.vertical,
-                ),
+            ]),
           ),
         ],
       ),
@@ -424,19 +400,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
         //Navigator.pop(context);
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => PlayerScreen(video: video)));
-
-        int cplx = 0;
-        for (int i = 0; i < videoHistory.length; i++) {
-          if (video.id == videoHistory[i].id) cplx++;
-        }
-        if (cplx == 0) {
-          videoHistory.add(video);
-        } else {}
-        // print('<----URL Thumbnails---->');
-        // print(video.thumbnail.high.url);
-        // print(video.thumbnail.medium.url);
-        // print(video.thumbnail.small.url);
-        // print('<----URL Thumbnails---->');
+        Provider.of<AppVariable>(context, listen: false)
+            .extendHistoryVideo(video);
       },
       child: Container(
         color: Colors.white,
@@ -604,87 +569,4 @@ class _PlayerScreenState extends State<PlayerScreen> {
       ),
     );
   }
-
-  //Thumbnail nhỏ
-  // Widget listItem(YouTubeVideo video) {
-  //   return InkWell(
-  //     hoverColor: Colors.black12,
-  //     onTap: () {
-  //       videoHistory.add(video);
-  //       tempVideoSelect = video;
-
-  //       int cplx = 0;
-  //       for (int i = 0; i < videoHistory.length; i++) {
-  //         if (video.id == videoHistory[i].id) cplx++;
-  //       }
-
-  //       if (cplx == 0) {
-  //         videoHistory.add(video);
-  //       } else {}
-
-  //       _tempController = YoutubePlayerController(
-  //         initialVideoId: tempVideoSelect.id!,
-  //         params: YoutubePlayerParams(
-  //           playlist: generatorPlaylist(), // Defining custom playlist
-  //           startAt: const Duration(seconds: 0),
-  //           showControls: true,
-  //           showFullscreenButton: true,
-  //           autoPlay: true,
-  //           playsInline: true,
-  //           privacyEnhanced: true,
-  //           strictRelatedVideos: true,
-  //         ),
-  //       );
-  //       selectVideo();
-
-  //       //print(videoSelect.title);
-  //     },
-  //     child: Container(
-  //       decoration: const BoxDecoration(),
-  //       margin: const EdgeInsets.symmetric(
-  //         vertical: 7.0,
-  //         horizontal: 7.0,
-  //       ),
-  //       padding: const EdgeInsets.all(12.0),
-  //       child: Row(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: <Widget>[
-  //           Padding(
-  //             padding: const EdgeInsets.only(right: 20.0, top: 10),
-  //             child: Image.network(
-  //               video.thumbnail.medium.url ?? '',
-  //               width: 130.0,
-  //             ),
-  //           ),
-  //           Expanded(
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: <Widget>[
-  //                 Text(
-  //                   video.title,
-  //                   softWrap: true,
-  //                   style: const TextStyle(
-  //                       fontSize: 15.0, fontWeight: FontWeight.bold),
-  //                 ),
-  //                 Padding(
-  //                   padding: const EdgeInsets.symmetric(vertical: 3.0),
-  //                   child: Text(
-  //                     video.channelTitle,
-  //                     softWrap: true,
-  //                     style: const TextStyle(fontSize: 14),
-  //                   ),
-  //                 ),
-  //                 Text(
-  //                   'Duration: ${video.duration ?? "00:00"} ',
-  //                   style: const TextStyle(fontSize: 14),
-  //                   softWrap: true,
-  //                 ),
-  //               ],
-  //             ),
-  //           )
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 }
