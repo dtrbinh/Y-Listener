@@ -1,7 +1,7 @@
 // ignore_for_file: file_names, avoid_print
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:y_listener/models/state%20management/app_variable.dart';
+import 'package:y_listener/data/models/provider/app_variable.dart';
 import 'package:y_listener/screens/player_screen.dart';
 import 'package:y_listener/screens/settings/API.dart';
 import 'package:youtube_api/youtube_api.dart';

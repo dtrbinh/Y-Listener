@@ -1,9 +1,10 @@
 // ignore_for_file: no_logic_in_create_state, unnecessary_const, avoid_print
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:y_listener/models/api/channel_icon.dart';
-import 'package:y_listener/models/api/video_info.dart';
-import 'package:y_listener/models/state%20management/app_variable.dart';
+import 'package:y_listener/data/models/api/channel_icon.dart';
+import 'package:y_listener/data/models/api/video_info.dart';
+import 'package:y_listener/data/models/object/youTubeVideoInfo.dart';
+import 'package:y_listener/data/models/provider/app_variable.dart';
 import 'package:y_listener/screens/history_video_screen.dart';
 import 'package:y_listener/screens/settings/API.dart';
 
@@ -381,7 +382,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 builder: (context, value, child) {
                   return Column(
                     children:
-                        value.searchResult.map<Widget>(listItemFull).toList(),
+                        value.search.map<Widget>(listItemFull).toList(),
                   );
                 },
               )
@@ -392,16 +393,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
     );
   }
 
-  Widget listItemFull(YouTubeVideo video) {
+  Widget listItemFull(YoutubeVideoInfo data) {
     return InkWell(
       hoverColor: Colors.black12,
       onTap: () {
         _controller.stop();
         //Navigator.pop(context);
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => PlayerScreen(video: video)));
+            builder: (context) => PlayerScreen(video: data.video)));
         Provider.of<AppVariable>(context, listen: false)
-            .extendHistoryVideo(video);
+            .extendHistoryVideo(data);
       },
       child: Container(
         color: Colors.white,
@@ -415,7 +416,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 Container(
                   color: Colors.white,
                   child: Image.network(
-                    video.thumbnail.medium.url ?? '',
+                    data.video.thumbnail.medium.url ?? '',
                     width: MediaQuery.of(context).size.width,
                     scale: 0.8,
                   ),
@@ -433,7 +434,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           child: Padding(
                         padding: const EdgeInsets.all(0),
                         child: Text(
-                          video.duration ?? '',
+                          data.video.duration ?? '',
                           softWrap: true,
                           style: const TextStyle(
                               fontSize: 17,
@@ -454,7 +455,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 10),
                     child: Text(
-                      video.title,
+                      data.video.title,
                       softWrap: true,
                       style: const TextStyle(
                           fontSize: 20, fontWeight: FontWeight.bold),
@@ -463,7 +464,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10, left: 10),
                     child: FutureBuilder<String>(
-                      future: getViewCount(video.id!, apiKey), // async work
+                      future: getViewCount(data.video.id!, apiKey), // async work
                       builder: (BuildContext context,
                           AsyncSnapshot<String> snapshot) {
                         switch (snapshot.connectionState) {
@@ -484,7 +485,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                               return Text(
                                 snapshot.data! +
                                     ' lượt xem ' '• ' +
-                                    dayPublish(video.publishedAt!),
+                                    dayPublish(data.video.publishedAt!),
                                 //'28 N lượt xem' ' • ' '2 năm trước',
                                 softWrap: true,
                                 style: const TextStyle(fontSize: 17),
@@ -504,7 +505,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                             children: <Widget>[
                               FutureBuilder<String>(
                                 future: getChannelIcon(
-                                    video.channelId!, apiKey), // async work
+                                    data.video.channelId!, apiKey), // async work
                                 builder: (BuildContext context,
                                     AsyncSnapshot<String> snapshot) {
                                   switch (snapshot.connectionState) {
@@ -538,7 +539,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                               Container(
                                 margin: const EdgeInsets.only(left: 10),
                                 child: Text(
-                                  video.channelTitle,
+                                  data.video.channelTitle,
                                   softWrap: true,
                                   style: const TextStyle(fontSize: 17),
                                 ),

@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:y_listener/screens/home_screen.dart';
-import 'models/state management/app_variable.dart';
+import 'data/models/provider/app_variable.dart';
 void main() {
   runApp(const MyApp());
 }

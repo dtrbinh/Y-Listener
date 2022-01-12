@@ -4,8 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:y_listener/models/api/video_info.dart';
-import 'package:y_listener/models/state%20management/app_variable.dart';
+import 'package:y_listener/data/models/api/video_info.dart';
+import 'package:y_listener/data/models/object/youTubeVideoInfo.dart';
+import 'package:y_listener/data/models/provider/app_variable.dart';
 import 'package:y_listener/screens/settings/settings_screen.dart';
 
 import 'package:youtube_api/youtube_api.dart';
@@ -13,7 +14,6 @@ import 'package:youtube_api/youtube_api.dart';
 import 'package:y_listener/screens/history_video_screen.dart';
 import 'package:y_listener/screens/search_screen.dart';
 import 'package:y_listener/screens/player_screen.dart';
-import 'package:y_listener/models/api/channel_icon.dart';
 import 'package:y_listener/screens/settings/API.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -165,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: (context, value, child) {
               return ListView(
                 children: Provider.of<AppVariable>(context, listen: false)
-                    .trendResult
+                    .trend
                     .map<Widget>(listItemFull)
                     .toList(),
               );
@@ -174,14 +174,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget listItemFull(YouTubeVideo video) {
+  Widget listItemFull(YoutubeVideoInfo data) {
     return InkWell(
       hoverColor: Colors.black12,
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => PlayerScreen(video: video)));
+            builder: (context) => PlayerScreen(video: data.video)));
         Provider.of<AppVariable>(context, listen: false)
-            .extendHistoryVideo(video);
+            .extendHistoryVideo(data);
       },
       child: Container(
         color: Colors.white,
@@ -194,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   color: Colors.white,
                   child: Image.network(
-                    video.thumbnail.medium.url ?? '',
+                    data.video.thumbnail.medium.url ?? '',
                     width: MediaQuery.of(context).size.width,
                     scale: 0.8,
                   ),
@@ -212,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Padding(
                         padding: const EdgeInsets.all(0),
                         child: Text(
-                          video.duration ?? '',
+                          data.video.duration ?? '',
                           softWrap: true,
                           style: const TextStyle(
                               fontSize: 17,
@@ -226,112 +226,63 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Container(
             margin: const EdgeInsets.only(left: 10),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    child: Text(
-                      video.title,
-                      softWrap: true,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Container(
-                      margin: const EdgeInsets.only(left: 10),
-                      child: FutureBuilder<String>(
-                        future: getViewCount(video.id!, apiKey), // async work
-                        builder: (BuildContext context,
-                            AsyncSnapshot<String> snapshot) {
-                          switch (snapshot.connectionState) {
-                            case ConnectionState.waiting:
-                              return const Text(
-                                '',
-                                softWrap: true,
-                                style: TextStyle(fontSize: 15),
-                              );
-                            default:
-                              if (snapshot.hasError) {
-                                return const Text(
-                                  '',
-                                  softWrap: true,
-                                  style: TextStyle(fontSize: 15),
-                                );
-                              } else {
-                                return Text(
-                                  snapshot.data! +
-                                      ' lượt xem ' '• ' +
-                                      dayPublish(video.publishedAt!),
-                                  //'28 N lượt xem' ' • ' '2 năm trước',
-                                  softWrap: true,
-                                  style: const TextStyle(fontSize: 15),
-                                );
-                              }
-                          }
-                        },
-                      )),
-                  Container(
-                      margin: const EdgeInsets.only(left: 0.0, top: 10),
-                      child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 0),
-                          child: Row(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
+                    Widget>[
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                child: Text(
+                  data.video.title,
+                  softWrap: true,
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Container(
+                  margin: const EdgeInsets.only(left: 10),
+                  child: Text(
+                    data.viewCount +
+                        ' lượt xem ' '• ' +
+                        dayPublish(data.video.publishedAt!),
+                    //'28 N lượt xem' ' • ' '2 năm trước',
+                    softWrap: true,
+                    style: const TextStyle(fontSize: 15),
+                  )),
+              Container(
+                  margin: const EdgeInsets.only(left: 0.0, top: 10),
+                  child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          CircleAvatar(
+                                radius: 18,
+                                backgroundImage: NetworkImage(
+                                  data.channelIconURL,
+                                ),
+                                backgroundColor: Colors.black12,
+                              ),
+                          Column(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              FutureBuilder<String>(
-                                future: getChannelIcon(
-                                    video.channelId!, apiKey), // async work
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<String> snapshot) {
-                                  switch (snapshot.connectionState) {
-                                    case ConnectionState.waiting:
-                                      return const CircleAvatar(
-                                        radius: 18,
-                                        backgroundImage: AssetImage(
-                                            'assets/img/loading-buffering.gif'),
-                                        backgroundColor: Colors.white,
-                                      );
-                                    default:
-                                      if (snapshot.hasError) {
-                                        return const CircleAvatar(
-                                          radius: 18,
-                                          backgroundImage: AssetImage(
-                                              'assets/img/alert.gif'),
-                                          backgroundColor: Colors.white,
-                                        );
-                                      } else {
-                                        return CircleAvatar(
-                                          radius: 18,
-                                          backgroundImage: NetworkImage(
-                                            snapshot.data!,
-                                          ),
-                                          backgroundColor: Colors.black12,
-                                        );
-                                      }
-                                  }
-                                },
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                      margin: const EdgeInsets.only(left: 15.0),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 0, vertical: 0),
-                                        child: Text(
-                                          video.channelTitle,
-                                          softWrap: true,
-                                          style: const TextStyle(fontSize: 15),
-                                        ),
-                                      )),
-                                ],
-                              ),
+                            children: [
+                              Container(
+                                  margin: const EdgeInsets.only(left: 15.0),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 0, vertical: 0),
+                                    child: Text(
+                                      data.video.channelTitle,
+                                      softWrap: true,
+                                      style: const TextStyle(fontSize: 15),
+                                    ),
+                                  )),
                             ],
-                          ))),
-                ]),
+                          ),
+                        ],
+                      ))),
+            ]),
           ),
           const Divider(
             height: 20,
