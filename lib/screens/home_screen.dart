@@ -163,12 +163,16 @@ class _HomeScreenState extends State<HomeScreen> {
               Provider.of<AppVariable>(context, listen: false).callDefaultAPI,
           child: Consumer<AppVariable>(
             builder: (context, value, child) {
-              return ListView(
-                children: Provider.of<AppVariable>(context, listen: false)
-                    .trend
-                    .map<Widget>(listItemFull)
-                    .toList(),
-              );
+              return Provider.of<AppVariable>(context, listen: false)
+                      .trendIsLoad()
+                  ? ListView(
+                      children: Provider.of<AppVariable>(context, listen: false)
+                          .trend
+                          .map<Widget>(listItemFull)
+                          .toList())
+                  : const Center(
+                      child: CircularProgressIndicator(),
+                    );
             },
           )),
     );
@@ -226,63 +230,63 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Container(
             margin: const EdgeInsets.only(left: 10),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
-                    Widget>[
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: Text(
-                  data.video.title,
-                  softWrap: true,
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Container(
-                  margin: const EdgeInsets.only(left: 10),
-                  child: Text(
-                    data.viewCount +
-                        ' lượt xem ' '• ' +
-                        dayPublish(data.video.publishedAt!),
-                    //'28 N lượt xem' ' • ' '2 năm trước',
-                    softWrap: true,
-                    style: const TextStyle(fontSize: 15),
-                  )),
-              Container(
-                  margin: const EdgeInsets.only(left: 0.0, top: 10),
-                  child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          CircleAvatar(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    child: Text(
+                      data.video.title,
+                      softWrap: true,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Container(
+                      margin: const EdgeInsets.only(left: 10),
+                      child: Text(
+                        data.viewCount +
+                            ' lượt xem ' '• ' +
+                            dayPublish(data.video.publishedAt!),
+                        //'28 N lượt xem' ' • ' '2 năm trước',
+                        softWrap: true,
+                        style: const TextStyle(fontSize: 15),
+                      )),
+                  Container(
+                      margin: const EdgeInsets.only(left: 0.0, top: 10),
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              CircleAvatar(
                                 radius: 18,
                                 backgroundImage: NetworkImage(
                                   data.channelIconURL,
                                 ),
                                 backgroundColor: Colors.black12,
                               ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                  margin: const EdgeInsets.only(left: 15.0),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 0, vertical: 0),
-                                    child: Text(
-                                      data.video.channelTitle,
-                                      softWrap: true,
-                                      style: const TextStyle(fontSize: 15),
-                                    ),
-                                  )),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                      margin: const EdgeInsets.only(left: 15.0),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 0, vertical: 0),
+                                        child: Text(
+                                          data.video.channelTitle,
+                                          softWrap: true,
+                                          style: const TextStyle(fontSize: 15),
+                                        ),
+                                      )),
+                                ],
+                              ),
                             ],
-                          ),
-                        ],
-                      ))),
-            ]),
+                          ))),
+                ]),
           ),
           const Divider(
             height: 20,

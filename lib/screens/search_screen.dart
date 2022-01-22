@@ -91,10 +91,16 @@ class _SearchScreenState extends State<SearchScreen> {
         backgroundColor: Colors.white,
         body: Center(child: Consumer<AppVariable>(
           builder: (context, value, child) {
-            return ListView(
-              controller: scrollController,
-              children: value.search.map<Widget>(listItemFull).toList(),
-            );
+            return Provider.of<AppVariable>(context, listen: false)
+                    .searchIsLoad()
+                ? ListView(
+                    children: Provider.of<AppVariable>(context, listen: false)
+                        .search
+                        .map<Widget>(listItemFull)
+                        .toList())
+                : const Center(
+                    child: CircularProgressIndicator(),
+                  );
           },
         )),
       ),

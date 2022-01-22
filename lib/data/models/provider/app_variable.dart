@@ -26,6 +26,16 @@ class AppVariable with ChangeNotifier {
   String region = 'VN';
   List<String> regionCode = [];
 
+  bool trendSuccess = false;
+  bool searchSuccess = false;
+
+  bool trendIsLoad() {
+    return trendSuccess;
+  }
+  bool searchIsLoad() {
+    return searchSuccess;
+  }
+
   void changeAPI() {
     if (index >= 0 && index < key.length - 1) {
       var temp = index + 1;
@@ -42,16 +52,18 @@ class AppVariable with ChangeNotifier {
     print('Calling trending...');
     try {
       trendResult = await youtube.getTrends(regionCode: region);
-      generateTrendInfo();
+      trendSuccess = true;
+      await generateTrendInfo();
+      print('Called Trending!');
+      notifyListeners();
     } catch (e) {
+      trendSuccess = false;
       print('Exception handled!');
       print(e);
       changeAPI();
       youtube = YoutubeAPI(apiKey);
       callDefaultAPI();
     }
-    print('Called Trending!');
-    notifyListeners();
   }
 
   Future<void> callAPI(String query) async {
@@ -69,16 +81,18 @@ class AppVariable with ChangeNotifier {
         videoDuration: 'any',
         regionCode: region,
       );
-      generateSearchInfo();
+      await generateSearchInfo();
+      searchSuccess = true;
+      print("Searched!");
+      notifyListeners();
     } catch (e) {
+      searchSuccess = false;
       print('Exception handled!');
       print(e);
       changeAPI();
       youtube = YoutubeAPI(apiKey);
       callAPI(query);
     }
-    print("Searched!");
-    notifyListeners();
   }
 
   Future<void> generateTrendInfo() async {
