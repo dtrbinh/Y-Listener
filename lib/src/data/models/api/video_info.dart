@@ -120,12 +120,13 @@ class PageInfo {
 Future<String> getViewCount(String videoId, String apiKey) async {
   String url = '';
   late VideoInfor videoInfor;
-  url = 'https://www.googleapis.com/youtube/v3/videos?id=$videoId&key=$apiKey&part=statistics';
+  url =
+      'https://www.googleapis.com/youtube/v3/videos?id=$videoId&key=$apiKey&part=statistics';
   try {
     final response = await http.get(Uri.parse(url));
     videoInfor = VideoInfor.fromJson(json.decode(response.body));
   } catch (e) {
-    print('Load video info err');
+    print('Error: video viewcount.');
     return '0';
   }
   return convertCount(int.parse(videoInfor.items[0].statistics.viewCount));
@@ -142,7 +143,7 @@ String convertCount(int viewCount) {
   } else if (viewCount >= 1000000000) {
     result = '${(viewCount / 1000000000).toStringAsFixed(1)} Tỷ';
   }
-  print('Load video info success!');
+  print('Load video viewCount success!');
 
   return result;
 }
@@ -168,12 +169,10 @@ String dayPublish(String daytime) {
             if (videoDay.second == current.second) {
               result = 'Vừa xong';
             } else {
-              result =
-                  '${current.second - videoDay.second} giây trước';
+              result = '${current.second - videoDay.second} giây trước';
             }
           } else {
-            result =
-                '${current.minute - videoDay.minute} phút trước';
+            result = '${current.minute - videoDay.minute} phút trước';
           }
         } else {
           result = '${current.hour - videoDay.hour} giờ trước';

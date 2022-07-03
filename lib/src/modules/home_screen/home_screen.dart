@@ -156,18 +156,26 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       //Trending video
       body: RefreshIndicator(
+          color: Colors.white,
+          backgroundColor: Colors.red,
           onRefresh: Provider.of<SearcherProvider>(context, listen: false)
               .initTrending,
           child: Consumer<SearcherProvider>(
             builder: (context, value, child) {
               return Provider.of<SearcherProvider>(context, listen: false)
                       .trendSuccess
-                  ? ListView(
-                      children:
-                          Provider.of<SearcherProvider>(context, listen: false)
-                              .trend
-                              .map<Widget>(listItemFull)
-                              .toList())
+                  ? ScrollConfiguration(
+                      behavior: const ScrollBehavior(),
+                      child: GlowingOverscrollIndicator(
+                        axisDirection: AxisDirection.down,
+                        color: Colors.red,
+                        child: ListView(
+                            children: Provider.of<SearcherProvider>(context,
+                                    listen: false)
+                                .trend
+                                .map<Widget>(listItemFull)
+                                .toList()),
+                      ))
                   : const Center(
                       child: CircularProgressIndicator(
                         color: Colors.red,
