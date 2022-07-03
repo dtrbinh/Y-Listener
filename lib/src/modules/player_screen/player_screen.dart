@@ -36,7 +36,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
         showControls: true,
         showFullscreenButton: true,
         strictRelatedVideos: true,
-        desktopMode: false,
+        desktopMode: true,
+        autoPlay: true,
       ),
     );
     print('Generated!');
@@ -461,7 +462,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 10, left: 10),
                 child: FutureBuilder<String>(
-                  future: getViewCount(data.video.id!, keySelected), // async work
+                  future:
+                      getViewCount(data.video.id!, keySelected), // async work
                   builder:
                       (BuildContext context, AsyncSnapshot<String> snapshot) {
                     switch (snapshot.connectionState) {
@@ -499,8 +501,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           FutureBuilder<String>(
-                            future: getChannelIcon(
-                                data.video.channelId!, keySelected), // async work
+                            future: getChannelIcon(data.video.channelId!,
+                                keySelected), // async work
                             builder: (BuildContext context,
                                 AsyncSnapshot<String> snapshot) {
                               switch (snapshot.connectionState) {

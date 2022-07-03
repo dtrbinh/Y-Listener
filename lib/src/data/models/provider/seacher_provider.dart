@@ -32,10 +32,13 @@ class SearcherProvider with ChangeNotifier {
   Future<void> initTrending() async {
     print("Init home screen's video...");
     try {
+      trend.clear();
       trendResult = await youtube.getTrends(regionCode: region);
       trendSuccess = true;
       await generateTrendInfo();
       print('Called Trending!');
+      notifyListeners();
+      searcher("Nhạc remix tiktok");
     } catch (e) {
       trendSuccess = false;
       print('Exception handled!');
@@ -44,7 +47,6 @@ class SearcherProvider with ChangeNotifier {
       youtube.setKey = keySelected;
       initTrending();
     }
-    notifyListeners();
   }
 
   Future<void> searcher(String query) async {
@@ -54,7 +56,6 @@ class SearcherProvider with ChangeNotifier {
       search.clear();
       searchSuccess = false;
       notifyListeners();
-      print("\nSearching: $query");
       try {
         searchResult = await youtube.search(
           query,
@@ -66,6 +67,7 @@ class SearcherProvider with ChangeNotifier {
         );
         await generateSearchInfo();
         searchSuccess = true;
+        notifyListeners();
       } catch (e) {
         searchSuccess = false;
         print('Exception: ');
@@ -75,7 +77,6 @@ class SearcherProvider with ChangeNotifier {
         searcher(query);
       }
     }
-    notifyListeners();
   }
 
   Future<void> generateTrendInfo() async {
@@ -100,8 +101,8 @@ class SearcherProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> extendSearchResult(scrollController) async {
-    if (scrollController.position.extentAfter < 100) {
+  Future<void> extendSearchResult() async {
+    try {
       var tempResult = await youtube.nextPage();
       for (var i = 0; i < tempResult.length; i++) {
         var tempIcon =
@@ -112,6 +113,10 @@ class SearcherProvider with ChangeNotifier {
       }
       print('Loaded next page!');
       notifyListeners();
+    } catch (e) {
+      print("\nError: extend search result - lazy load");
+      getIt.get<APIProvider>().changeAPIKey();
+      extendSearchResult();
     }
   }
 

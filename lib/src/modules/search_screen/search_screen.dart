@@ -12,7 +12,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  late ScrollController scrollController;
+  ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
@@ -24,9 +24,12 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<void> scrollListener() async {
-    if (Provider.of<SearcherProvider>(context, listen: false).search != []) {
+    print(scrollController.position.maxScrollExtent);
+    if (Provider.of<SearcherProvider>(context, listen: false).search != [] &&
+        scrollController.position.pixels ==
+            scrollController.position.maxScrollExtent) {
       Provider.of<SearcherProvider>(context, listen: false)
-          .extendSearchResult(scrollController);
+          .extendSearchResult();
     }
   }
 
@@ -87,12 +90,19 @@ class _SearchScreenState extends State<SearchScreen> {
           builder: (context, value, child) {
             return Provider.of<SearcherProvider>(context, listen: false)
                     .searchSuccess
-                ? ListView(
-                    children:
-                        Provider.of<SearcherProvider>(context, listen: false)
-                            .search
-                            .map<Widget>(listItemFull)
-                            .toList())
+                ? ScrollConfiguration(
+                    behavior: const ScrollBehavior(),
+                    child: GlowingOverscrollIndicator(
+                      axisDirection: AxisDirection.down,
+                      color: Colors.red,
+                      child: ListView(
+                          controller: scrollController,
+                          children: Provider.of<SearcherProvider>(context,
+                                  listen: false)
+                              .search
+                              .map<Widget>(listItemFull)
+                              .toList()),
+                    ))
                 : const Center(
                     child: CircularProgressIndicator(
                       color: Colors.red,
